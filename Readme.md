@@ -1,20 +1,23 @@
-# ammojs-typed (bhirbec fork)
+# bullet-ts
 
-A self-contained, ready-to-use package of [Ammo.js](https://github.com/kripken/ammo.js)
-(Bullet Physics → WASM) with TypeScript types and a **single `Ammo` namespace** entry — used as
-both a runtime value and a type, like `import * as THREE from 'three'`.
+A self-contained, ready-to-use package of the [Bullet Physics](https://github.com/bulletphysics/bullet3)
+engine for TypeScript — built on [ammo.js](https://github.com/kripken/ammo.js) (Bullet → WASM) —
+with full type definitions and a **single-namespace** ESM entry, used as both a runtime value and
+a type, like `import * as THREE from 'three'`.
 
-This fork (of [giniedp/ammojs-typed](https://github.com/giniedp/ammojs-typed)) ships the WASM
-build plus a generated ESM entry, so consumers just install it and import — no vendoring, no
-hand-written wrapper, no build step on the consumer side.
+It ships the WASM build plus a generated ESM entry, so consumers just install it and import — no
+vendoring, no hand-written wrapper, no build step on the consumer side.
+
+> Built on [kripken/ammo.js](https://github.com/kripken/ammo.js) (zlib) and the type-generation
+> approach of [giniedp/ammojs-typed](https://github.com/giniedp/ammojs-typed) (MIT). See LICENSE.
 
 ## Usage
 
 ```ts
-import * as Ammo from 'ammojs-typed';
+import * as bullet from 'bullet-ts';   // the alias is yours to pick
 
-new Ammo.btVector3(1, 2, 3);   // value (constructor)
-let v: Ammo.btVector3;         // type
+new bullet.btVector3(1, 2, 3);   // value (constructor)
+let v: bullet.btVector3;         // type
 ```
 
 The WASM runtime is bootstrapped once via top-level `await` inside the package, so it is ready
@@ -29,7 +32,7 @@ from dep pre-bundling so the asset URL resolves correctly:
 
 ```ts
 // vite.config.ts
-optimizeDeps: { exclude: ['ammojs-typed'] }
+optimizeDeps: { exclude: ['bullet-ts'] }
 ```
 
 ### Install (git dependency)
@@ -37,7 +40,7 @@ optimizeDeps: { exclude: ['ammojs-typed'] }
 ```jsonc
 // package.json
 "dependencies": {
-  "ammojs-typed": "github:bhirbec/ammojs-typed#v1.1.0"
+  "bullet-ts": "github:bhirbec/bullet-ts#v1.2.0"
 }
 ```
 
@@ -51,9 +54,12 @@ Pin a tag (not a moving branch) for reproducible installs.
 | `index.d.ts` | generated (`gen-entry.js`) | type entry — each name re-exported as a value **and** a type |
 | `ammo.wasm.js` | upstream + `patch-wasm.js` | emscripten loader (patched to be a clean ESM default export) |
 | `ammo.wasm.wasm` | upstream | the WASM binary |
-| `ammo.d.ts` | generated (`webidl-dts-gen`) | the `Ammo` namespace declarations |
+| `ammo.d.ts` | generated (`webidl-dts-gen`) | the namespace declarations |
 | `ammo.idl` | upstream | WebIDL source the `.d.ts` is generated from |
 | `ambient/ammo.d.ts` | generated | ambient/global variant of the types |
+
+(The internal files keep their `ammo.*` names — they're the upstream ammo.js build artifacts; the
+package itself is `bullet-ts`.)
 
 ### Engine glue baked in
 
@@ -96,5 +102,6 @@ upstream project): add `void setValue(float x, float y, float z);` to `btVector4
 
 ## References
 
-- https://github.com/kripken/ammo.js
-- https://github.com/giniedp/ammojs-typed (upstream)
+- https://github.com/bulletphysics/bullet3 (Bullet Physics)
+- https://github.com/kripken/ammo.js (Bullet → WASM)
+- https://github.com/giniedp/ammojs-typed (type-generation approach this builds on)

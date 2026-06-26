@@ -4,7 +4,7 @@
 //   node scripts/gen-entry.js
 //
 // It reads the class/enum/function names from ammo/ammo.d.ts and emits TWO committed files so
-// consumers can `import * as Ammo from 'ammojs-typed'` and use `Ammo.btVector3` as BOTH a value
+// consumers can `import * as bullet from 'bullet-ts'` and use `bullet.btVector3` as BOTH a value
 // (constructor) and a type — exactly like `import * as THREE from 'three'`:
 //
 //   ammo/index.js    runtime ESM: bootstraps the WASM (top-level await) and re-exports each
