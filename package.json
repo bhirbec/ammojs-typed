@@ -1,22 +1,35 @@
 {
   "name": "ammojs-typed",
-  "version": "1.0.5",
-  "description": "Ammo.js with type definitions",
-  "main": "ammo/ammo.js",
-  "types": "ammo/ammo.d.ts",
+  "version": "1.1.0",
+  "description": "Ammo.js (WASM) with TypeScript definitions and a ready-to-use single-namespace ESM entry",
+  "type": "module",
+  "main": "ammo/index.js",
+  "module": "ammo/index.js",
+  "types": "ammo/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./ammo/index.d.ts",
+      "import": "./ammo/index.js"
+    },
+    "./ammo.wasm.wasm": "./ammo/ammo.wasm.wasm"
+  },
   "scripts": {
-    "download:idl": "curl -L https://raw.githubusercontent.com/kripken/ammo.js/main/ammo.idl -o ./ammo/ammo.idl",
-    "download:js": "curl -L https://raw.githubusercontent.com/kripken/ammo.js/main/builds/ammo.js -o ./ammo/ammo.js",
-    "download": "npm run download:idl && npm run download:js",
-    "generate": "yarn generate:module && yarn generate:ambient",
+    "download:idl": "curl -fL https://raw.githubusercontent.com/kripken/ammo.js/main/ammo.idl -o ./ammo/ammo.idl",
+    "download:wasm:js": "curl -fL https://raw.githubusercontent.com/kripken/ammo.js/main/builds/ammo.wasm.js -o ./ammo/ammo.wasm.js",
+    "download:wasm:wasm": "curl -fL https://raw.githubusercontent.com/kripken/ammo.js/main/builds/ammo.wasm.wasm -o ./ammo/ammo.wasm.wasm",
+    "download": "yarn download:idl && yarn download:wasm:js && yarn download:wasm:wasm",
+    "patch:wasm": "node scripts/patch-wasm.js",
     "generate:module": "webidl-dts-gen -i ./ammo/ammo.idl -o ./ammo/ammo.d.ts -ed -n Ammo",
-    "generate:ambient": "webidl-dts-gen -i ./ammo/ammo.idl -o ./ammo/ambient/ammo.d.ts -e -n Ammo"
+    "generate:ambient": "webidl-dts-gen -i ./ammo/ammo.idl -o ./ammo/ambient/ammo.d.ts -e -n Ammo",
+    "generate:entry": "node scripts/gen-entry.js",
+    "generate": "yarn generate:module && yarn generate:ambient && yarn generate:entry",
+    "build": "yarn download && yarn patch:wasm && yarn generate"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/giniedp/ammojs-typed.git"
+    "url": "https://github.com/bhirbec/ammojs-typed.git"
   },
-  "homepage": "https://github.com/giniedp/ammojs-typed",
+  "homepage": "https://github.com/bhirbec/ammojs-typed",
   "author": "Alexander Gräfenstein",
   "files": [
     "ammo",

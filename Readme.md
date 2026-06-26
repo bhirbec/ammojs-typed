@@ -1,152 +1,100 @@
-# Ammo.js Typed
+# ammojs-typed (bhirbec fork)
 
-This project provides the [Ammo.js](https://github.com/kripken/ammo.js) modules with typescript definitions.
+A self-contained, ready-to-use package of [Ammo.js](https://github.com/kripken/ammo.js)
+(Bullet Physics → WASM) with TypeScript types and a **single `Ammo` namespace** entry — used as
+both a runtime value and a type, like `import * as THREE from 'three'`.
 
-# Installation
+This fork (of [giniedp/ammojs-typed](https://github.com/giniedp/ammojs-typed)) ships the WASM
+build plus a generated ESM entry, so consumers just install it and import — no vendoring, no
+hand-written wrapper, no build step on the consumer side.
 
-Use npm or yarn to install this version of ammojs from npm
-
-```
-$ npm install ammojs-typed
-```
-
-or from github
-
-```
-$ npm install github:giniedp/ammojs-typed
-```
-
-# Usage
-## Ammo as window global
-
-Configure your `tsconfig.json` to lookup the ambient types
-
-```json
-  "typeRoots": ["node_modules/ammojs-typed/ammo/ambient"]
-```
-
-Then at some point require ammo.js (depends on your build chain)
+## Usage
 
 ```ts
-require('ammojs-typed')
+import * as Ammo from 'ammojs-typed';
+
+new Ammo.btVector3(1, 2, 3);   // value (constructor)
+let v: Ammo.btVector3;         // type
 ```
 
-or reference the script
+The WASM runtime is bootstrapped once via top-level `await` inside the package, so it is ready
+before any importer runs — no `.then()` and no "undefined until loaded" footgun. Because of the
+top-level await, the consumer's bundler must target **es2022 or newer** (e.g. Vite
+`build.target: 'es2022'`).
 
-```html
-<script src="./ammo.js">
-```
-
-And use the global `Ammo` object
+The WASM binary is located via `new URL('./ammo.wasm.wasm', import.meta.url)`, so a bundler like
+Vite fingerprints it and resolves an absolute, route-independent URL automatically — no
+`locateFile` override and no static-copy step in the consumer. With Vite, exclude this package
+from dep pre-bundling so the asset URL resolves correctly:
 
 ```ts
-Ammo().then(() => {
-  new Ammo.btVector3(1, 2, 3)
-})
+// vite.config.ts
+optimizeDeps: { exclude: ['ammojs-typed'] }
 ```
 
-## Ammo as es6 module import
+### Install (git dependency)
 
-You probably need to set the following `compilerOptions` in `tsconfig.json`
-
-```json
-  "allowSyntheticDefaultImports": true,
-  "esModuleInterop": true
+```jsonc
+// package.json
+"dependencies": {
+  "ammojs-typed": "github:bhirbec/ammojs-typed#v1.1.0"
+}
 ```
 
-Then import ammo like this
+Pin a tag (not a moving branch) for reproducible installs.
 
-```ts
-import Ammo from 'ammojs-typed'
+## What's in `ammo/`
+
+| File | Source | Role |
+|------|--------|------|
+| `index.js` | generated (`gen-entry.js`) | runtime ESM entry — bootstraps WASM, re-exports the namespace as values |
+| `index.d.ts` | generated (`gen-entry.js`) | type entry — each name re-exported as a value **and** a type |
+| `ammo.wasm.js` | upstream + `patch-wasm.js` | emscripten loader (patched to be a clean ESM default export) |
+| `ammo.wasm.wasm` | upstream | the WASM binary |
+| `ammo.d.ts` | generated (`webidl-dts-gen`) | the `Ammo` namespace declarations |
+| `ammo.idl` | upstream | WebIDL source the `.d.ts` is generated from |
+| `ambient/ammo.d.ts` | generated | ambient/global variant of the types |
+
+### Engine glue baked in
+
+`index.js` patches `setEntityId(id)` / `getEntityId()` onto `btCollisionShape` and
+`btPairCachingGhostObject` prototypes. This lets a host engine map a collision/raycast hit back to
+its own entity. (Bullet's native `setUserPointer` was tried and proved unreliable, so a dedicated
+prototype slot is used instead.) This is the one host-specific concession that keeps the package
+self-contained for its consumer.
+
+## Updating / refreshing the build
+
+The committed `ammo/` artifacts are the known-good build. To refresh from upstream:
+
+```bash
+yarn install        # webidl-dts-gen (dev dependency)
+yarn build          # download + patch:wasm + generate (d.ts + entry)
 ```
 
-This works but be cautious here. The default import gives you the bootstrap function.
-After bootstrapping the api is not available through the `Ammo` symbol by default.
+`yarn build` runs:
+1. `download` — fetch `ammo.idl`, `ammo.wasm.js`, `ammo.wasm.wasm` from kripken/ammo.js (`curl -fL`,
+   so HTTP errors fail loudly).
+2. `patch:wasm` — strip the `this.Ammo = …` global-attach line (throws ESM strict-mode) and append
+   `export default Ammo;`. Asserts exactly one match so an upstream footer change fails loudly.
+3. `generate` — regenerate `ammo.d.ts` + `ambient/ammo.d.ts` (`webidl-dts-gen`) and the
+   `index.js` / `index.d.ts` entry (`gen-entry.js`).
 
-```ts
-Ammo().then(api => {
-  const v1 = new api.btVector3(1, 2, 3)
-  const v2 = new Ammo.btVector3(1, 2, 3) // <-- runtime error here
-})
-```
+After refreshing, **review the diff and re-test in the consumer** — a newer upstream may change the
+WASM binary or the generated type surface (e.g. enum representation). Then commit, push, and tag a
+new version; consumers bump their `#<tag>` ref.
 
-You can work around that by booting like this
+> Note: a fresh `yarn generate` may not reproduce the committed `.d.ts` byte-for-byte if the
+> installed `webidl-dts-gen` differs from the version that produced it. The committed artifacts are
+> the source of truth for consumers.
 
-```ts
-Ammo(Ammo).then(() => {
-  const v2 = new Ammo.btVector3(1, 2, 3) // <-- works
-})
-```
+## Manual IDL adjustments
 
-## Ammo as dynamic import
+If regenerating from a fresh upstream `ammo.idl`, these historical tweaks may be needed (see the
+upstream project): add `void setValue(float x, float y, float z);` to `btVector4`, and make
+`btDbvtBroadphase` derive from `btBroadphaseInterface`.
 
-Enable same `compilerOptions` as above
+## References
 
-```ts
-import('./ammo.js')                        // use dynamic import
-  .then((Module) => Module.default())      // bootstrap ammo.js
-  .then((ammo) => {
-    const v1 = new ammo.btVector3(1, 2, 3) // use ammo here
-  })
-```
-
-Since typescript 3.8 you can use [type only imports](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html#type-only-imports-and-exports). So with dynamic imports you can safely import ammo.js types, without including them in you bundle like this
-
-```ts
-import type Ammo from './ammo.js'
-
-import('./ammo.js')                        // use dynamic import
-  .then((Module) => Module.default())      // bootstrap ammo.js
-  .then((ammo) => {
-    let v1: Ammo.btVector3 = null
-    // ...
-    v1 = v
-  })
-```
-
-# Generate .d.ts files
-
-Clone this repository and install node dependencies
-
-```
-git clone git@github.com:giniedp/ammojs-typed.git
-cd ammojs-typed
-npm install
-```
-
-Place the `ammo.idl` and `ammo.js` into the `./ammo` folder.
-To download the latest version from the ammo.js repository run
-
-```
-$ npm run download
-```
-
-Make your adjustments to the IDL file if needed (see below) and run
-
-```
-$ npm run generate
-```
-
-This will parse the `./ammo/ammo.idl` and generate a `./ammo/ammo.d.ts` as well as `./ammo/ambient/ammo.d.ts`
-
-# Manual IDL adjustments
-
-The `btVector4` implements the shape of `btVector3` which causes a signature mismatch of the `setValue` method which typescript complains about. Add the following to the `btVector4`
-
-```diff
-+void setValue(float x, float y, float z);
-```
-
-The `btDbvtBroadphase` should derive from `btBroadphaseInterface`
-
-```diff
--interface btDbvtBroadphase {
-+interface btDbvtBroadphase: btBroadphaseInterface {
-```
-
-# References
-
-- https://github.com/kripken/ammo.js/issues/233
-- https://github.com/microsoft/TSJS-lib-generator
-- https://github.com/osman-turan/ammo.js-typings
-- https://ts-ast-viewer.com
+- https://github.com/kripken/ammo.js
+- https://github.com/giniedp/ammojs-typed (upstream)
