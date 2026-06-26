@@ -273,17 +273,29 @@ export declare const btSoftBodyHelpers: typeof Ammo.btSoftBodyHelpers;
 export type btSoftBodyHelpers = Ammo.btSoftBodyHelpers;
 
 // --- enums (value + type) ---
-export declare const PHY_ScalarType: typeof Ammo.PHY_ScalarType;
-export type PHY_ScalarType = Ammo.PHY_ScalarType;
-export declare const eGIMPACT_SHAPE_TYPE: typeof Ammo.eGIMPACT_SHAPE_TYPE;
-export type eGIMPACT_SHAPE_TYPE = Ammo.eGIMPACT_SHAPE_TYPE;
-export declare const btConstraintParams: typeof Ammo.btConstraintParams;
-export type btConstraintParams = Ammo.btConstraintParams;
+
 
 // --- functions (value only) ---
 export declare const destroy: typeof Ammo.destroy;
+export declare const _malloc: typeof Ammo._malloc;
+export declare const _free: typeof Ammo._free;
+export declare const wrapPointer: typeof Ammo.wrapPointer;
+export declare const getPointer: typeof Ammo.getPointer;
+export declare const castObject: typeof Ammo.castObject;
+export declare const compare: typeof Ammo.compare;
+export declare const _emscripten_enum_PHY_ScalarType_PHY_FLOAT: typeof Ammo._emscripten_enum_PHY_ScalarType_PHY_FLOAT;
+export declare const _emscripten_enum_PHY_ScalarType_PHY_DOUBLE: typeof Ammo._emscripten_enum_PHY_ScalarType_PHY_DOUBLE;
+export declare const _emscripten_enum_PHY_ScalarType_PHY_INTEGER: typeof Ammo._emscripten_enum_PHY_ScalarType_PHY_INTEGER;
+export declare const _emscripten_enum_PHY_ScalarType_PHY_SHORT: typeof Ammo._emscripten_enum_PHY_ScalarType_PHY_SHORT;
+export declare const _emscripten_enum_PHY_ScalarType_PHY_FIXEDPOINT88: typeof Ammo._emscripten_enum_PHY_ScalarType_PHY_FIXEDPOINT88;
+export declare const _emscripten_enum_PHY_ScalarType_PHY_UCHAR: typeof Ammo._emscripten_enum_PHY_ScalarType_PHY_UCHAR;
+export declare const _emscripten_enum_eGIMPACT_SHAPE_TYPE_CONST_GIMPACT_COMPOUND_SHAPE: typeof Ammo._emscripten_enum_eGIMPACT_SHAPE_TYPE_CONST_GIMPACT_COMPOUND_SHAPE;
+export declare const _emscripten_enum_eGIMPACT_SHAPE_TYPE_CONST_GIMPACT_TRIMESH_SHAPE_PART: typeof Ammo._emscripten_enum_eGIMPACT_SHAPE_TYPE_CONST_GIMPACT_TRIMESH_SHAPE_PART;
+export declare const _emscripten_enum_eGIMPACT_SHAPE_TYPE_CONST_GIMPACT_TRIMESH_SHAPE: typeof Ammo._emscripten_enum_eGIMPACT_SHAPE_TYPE_CONST_GIMPACT_TRIMESH_SHAPE;
+export declare const _emscripten_enum_btConstraintParams_BT_CONSTRAINT_ERP: typeof Ammo._emscripten_enum_btConstraintParams_BT_CONSTRAINT_ERP;
+export declare const _emscripten_enum_btConstraintParams_BT_CONSTRAINT_STOP_ERP: typeof Ammo._emscripten_enum_btConstraintParams_BT_CONSTRAINT_STOP_ERP;
+export declare const _emscripten_enum_btConstraintParams_BT_CONSTRAINT_CFM: typeof Ammo._emscripten_enum_btConstraintParams_BT_CONSTRAINT_CFM;
+export declare const _emscripten_enum_btConstraintParams_BT_CONSTRAINT_STOP_CFM: typeof Ammo._emscripten_enum_btConstraintParams_BT_CONSTRAINT_STOP_CFM;
 
 // --- runtime helpers not present in the generated namespace (embind/emscripten) ---
-export declare const castObject: any;
-export declare const wrapPointer: any;
-export declare const getPointer: any;
+

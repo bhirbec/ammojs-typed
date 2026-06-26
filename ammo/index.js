@@ -156,14 +156,29 @@ export const btSoftRigidDynamicsWorld = lib.btSoftRigidDynamicsWorld;
 export const btSoftBodyHelpers = lib.btSoftBodyHelpers;
 
 // --- enums ---
-export const PHY_ScalarType = lib.PHY_ScalarType;
-export const eGIMPACT_SHAPE_TYPE = lib.eGIMPACT_SHAPE_TYPE;
-export const btConstraintParams = lib.btConstraintParams;
+
 
 // --- functions ---
 export const destroy = lib.destroy;
-
-// --- runtime helpers (embind/emscripten) ---
-export const castObject = lib.castObject;
+export const _malloc = lib._malloc;
+export const _free = lib._free;
 export const wrapPointer = lib.wrapPointer;
 export const getPointer = lib.getPointer;
+export const castObject = lib.castObject;
+export const compare = lib.compare;
+export const _emscripten_enum_PHY_ScalarType_PHY_FLOAT = lib._emscripten_enum_PHY_ScalarType_PHY_FLOAT;
+export const _emscripten_enum_PHY_ScalarType_PHY_DOUBLE = lib._emscripten_enum_PHY_ScalarType_PHY_DOUBLE;
+export const _emscripten_enum_PHY_ScalarType_PHY_INTEGER = lib._emscripten_enum_PHY_ScalarType_PHY_INTEGER;
+export const _emscripten_enum_PHY_ScalarType_PHY_SHORT = lib._emscripten_enum_PHY_ScalarType_PHY_SHORT;
+export const _emscripten_enum_PHY_ScalarType_PHY_FIXEDPOINT88 = lib._emscripten_enum_PHY_ScalarType_PHY_FIXEDPOINT88;
+export const _emscripten_enum_PHY_ScalarType_PHY_UCHAR = lib._emscripten_enum_PHY_ScalarType_PHY_UCHAR;
+export const _emscripten_enum_eGIMPACT_SHAPE_TYPE_CONST_GIMPACT_COMPOUND_SHAPE = lib._emscripten_enum_eGIMPACT_SHAPE_TYPE_CONST_GIMPACT_COMPOUND_SHAPE;
+export const _emscripten_enum_eGIMPACT_SHAPE_TYPE_CONST_GIMPACT_TRIMESH_SHAPE_PART = lib._emscripten_enum_eGIMPACT_SHAPE_TYPE_CONST_GIMPACT_TRIMESH_SHAPE_PART;
+export const _emscripten_enum_eGIMPACT_SHAPE_TYPE_CONST_GIMPACT_TRIMESH_SHAPE = lib._emscripten_enum_eGIMPACT_SHAPE_TYPE_CONST_GIMPACT_TRIMESH_SHAPE;
+export const _emscripten_enum_btConstraintParams_BT_CONSTRAINT_ERP = lib._emscripten_enum_btConstraintParams_BT_CONSTRAINT_ERP;
+export const _emscripten_enum_btConstraintParams_BT_CONSTRAINT_STOP_ERP = lib._emscripten_enum_btConstraintParams_BT_CONSTRAINT_STOP_ERP;
+export const _emscripten_enum_btConstraintParams_BT_CONSTRAINT_CFM = lib._emscripten_enum_btConstraintParams_BT_CONSTRAINT_CFM;
+export const _emscripten_enum_btConstraintParams_BT_CONSTRAINT_STOP_CFM = lib._emscripten_enum_btConstraintParams_BT_CONSTRAINT_STOP_CFM;
+
+// --- runtime helpers (embind/emscripten) ---
+
